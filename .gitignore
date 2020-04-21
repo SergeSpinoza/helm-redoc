@@ -1,0 +1,9 @@
+*.tgz
+.idea
+
+# misc
+.DS_Store
+
+# editor swap files
+*.swp
+

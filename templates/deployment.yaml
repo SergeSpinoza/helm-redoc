@@ -1,0 +1,57 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "redoc.fullname" . }}
+  labels:
+    app: {{ template "redoc.name" . }}
+    chart: {{ template "redoc.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "redoc.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "redoc.name" . }}
+        release: {{ .Release.Name }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.redoc.jsonPath }}
+          volumeMounts:
+          - mountPath: /usr/share/nginx/html/swagger.json
+            subPath: swagger.json
+            name: swagger-config
+          env:
+          - name: SPEC_URL
+            value: swagger.json
+          {{ else }}
+          env:
+          - name: SPEC_URL
+            value: {{ .Values.redoc.jsonUrl }}
+          {{- end }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.livenessProbe.httpGet.port }}
+          ports:
+          - name: http
+            containerPort: {{ .Values.service.port }}
+            protocol: TCP
+      {{- if .Values.redoc.jsonPath }}
+      volumes:
+        - name: swagger-config
+          configMap:
+            name: {{ template "redoc.fullname" . }}
+            items:
+            - key: conf.json
+              path: swagger.json
+      {{ end }}

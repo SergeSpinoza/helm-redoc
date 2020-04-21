@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "redoc.fullname" . }}
+  labels:
+    app: {{ template "redoc.name" . }}
+    chart: {{ template "redoc.chart" . }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+data:
+  conf.json: {{ .Files.Get (printf "%s" .Values.redoc.jsonPath) | toJson | indent 4}}
+
