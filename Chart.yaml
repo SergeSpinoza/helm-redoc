@@ -1,5 +1,5 @@
-name: redoc
-version: 0.0.1
+name: helm-redoc
+version: 0.1.0
 apiVersion: v2
 appVersion: 2.0.0
 description: ReDoc is an open-source software framework backed by a large ecosystem of tools that helps developers design, build, document, and consume RESTful Web services.
